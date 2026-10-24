@@ -35,6 +35,18 @@ describe("parsing", () => {
     expect(table.rows).toHaveLength(2);
   });
 
+  it("detects headerless data with local-format numbers (no country code)", () => {
+    const table = parsePastedText("Asha\t98765 43210\nRavi\t(022) 1234-5678");
+    expect(table.generatedHeaders).toBe(true);
+    expect(table.rows).toHaveLength(2);
+  });
+
+  it("does not mistake a header row with digits in a title for data", () => {
+    const table = parsePastedText("Name\tPhone 2026\nAsha\t9876543210");
+    expect(table.generatedHeaders).toBe(false);
+    expect(table.rows).toHaveLength(1);
+  });
+
   it("pads ragged rows and drops empty trailing columns", () => {
     const table = tableFromGrid([["a", "b", "", ""], ["1"], ["2", "3", ""]]);
     expect(table.headers).toEqual(["a", "b"]);

@@ -2,7 +2,6 @@ import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { MAX_IMPORT_ROWS } from "./fields";
 import { headerMatchesAnyField } from "./detect";
-import { normalizePhone } from "./validate";
 
 export interface RawTable {
   headers: string[];
@@ -27,10 +26,14 @@ function cellToString(value: unknown): string {
   return String(value).trim();
 }
 
-/** A row "looks like data" if it has no recognised header and a phone-like cell. */
+/**
+ * A row "looks like data" if it has no recognised header and a phone-shaped
+ * cell. Deliberately country-agnostic: local numbers like "98765 43210" can't
+ * be validated without a default country, but they're never column titles.
+ */
 function looksLikeDataRow(row: string[]): boolean {
   if (row.some((value) => headerMatchesAnyField(value))) return false;
-  return row.some((value) => /\d{6,}/.test(value.replace(/\D/g, "")) && normalizePhone(value).ok);
+  return row.some((value) => /^\+?\d{7,15}$/.test(value.replace(/^'+/, "").replace(/[\s\-().]/g, "")));
 }
 
 /** Turn a 2-D grid into headers + rows, trimming empty rows and ragged edges. */

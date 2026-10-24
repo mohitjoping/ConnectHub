@@ -6,6 +6,7 @@ import { writeAudit } from "@/lib/audit";
 import { CampaignRunError, dispatchDueCampaigns, estimateAudience, preflight, runCampaign, type AudienceEstimate } from "@/lib/campaigns/engine";
 import { TEMPLATE_FIELDS } from "@/lib/campaigns/logic";
 import { configuredProvider, getLiveReadiness } from "@/lib/compliance/readiness";
+import { defaultPhoneCountry } from "@/lib/env";
 import { normalizePhone } from "@/lib/import/validate";
 import type { ActionResult, Campaign } from "@/lib/types";
 import { dbError, withSession, zodMessage } from "./helpers";
@@ -57,7 +58,7 @@ export async function saveCampaign(input: z.input<typeof campaignInput>): Promis
 
     let callerId: string | null = null;
     if (v.channel === "voice" && v.callerId) {
-      const parsedCaller = normalizePhone(v.callerId);
+      const parsedCaller = normalizePhone(v.callerId, defaultPhoneCountry);
       if (!parsedCaller.ok) return { ok: false, error: `Caller ID: ${parsedCaller.reason}` };
       callerId = parsedCaller.e164;
     }

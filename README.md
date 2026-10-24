@@ -186,7 +186,11 @@ Open http://localhost:3000, create an account, and you'll land on the overview. 
 ```bash
 npm test
 ```
-84 Vitest tests cover CSV/TSV/paste/XLSX parsing, header and content-based column detection, phone/email/consent validation, in-file and existing duplicates, merge rules, eligibility (consent + suppression), template rendering, the live-readiness gate, the provider registry, both mock providers and media rules.
+123 Vitest tests cover:
+- **Import:** CSV/TSV/paste/XLSX parsing, header and content-based column detection, phone/email/consent validation, in-file and existing duplicates, and merge rules.
+- **Campaign engine** (`tests/engine.test.ts`, against an in-memory Supabase fake in `tests/helpers/`): audience snapshots, consent and suppression skips, per-recipient attempts, atomic claiming (two simultaneous runs send once), failure handling, WhatsApp template variables and header media, scheduled dispatch, and live mode staying locked even with the env flag on.
+- **Server actions** (`tests/actions.test.ts`): import chunks with skip/update strategies and consent attestation, contacts, suppression, and campaign save/delete rules.
+- **Rules:** eligibility, template rendering, the live-readiness gate, the provider registry, both mock providers and media rules.
 
 ```bash
 npm run test:db
